@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  database:
+    image: public.ecr.aws/docker/library/mysql:8.0.25
+    volumes:
+      - ${PWD}/data/blog:/var/lib/mysql
+      - ${PWD}/scripts/db:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+      TZ: America/Sao_Paulo
+    ports:
+      - ${DB_PORT}:3306
