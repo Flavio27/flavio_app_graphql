@@ -31,7 +31,7 @@ function App() {
   return (
     <div>
       <ul>
-        {data?.users.map(user => <li>Nome: {user.name} - Email: {user.email}</li>)}
+        {data?.users.map(({name, email, id}) => <li key={id}>Nome: {name} - Email: {email}</li>)}
       </ul>
       <NewUserForm/>
     </div>
