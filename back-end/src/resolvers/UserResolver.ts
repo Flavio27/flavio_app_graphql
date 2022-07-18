@@ -1,17 +1,25 @@
-import { User } from './../models/User';
+import crypto from 'node:crypto';
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
-import crypto from 'node:crypto'
-import { prisma } from '..';
+import { UserRepository } from '../repositories/userRepository/userRepository';
+import { User } from './../models/User';
 
 
 @Resolver()
 export class UserResolver {
-  private data: User[] = []
+  private repository = new UserRepository()
 
   @Query(() => [User])
   async users() {
-    const allUsers = await prisma.user.findMany()
+    const allUsers = await this.repository.getUsers()
     return allUsers
+  }
+
+  @Query(() => User)
+  async userById(
+    @Arg('id') id: string
+  ) {
+    const user = await this.repository.getUserByID(id)
+    return user
   }
 
   @Mutation(() => User)
@@ -19,18 +27,11 @@ export class UserResolver {
     @Arg('name') name: string,
     @Arg('email') email: string
   ) {
-    const user = {id: crypto.randomUUID(), name: name, email}
-    this.data.push(user)
-
-    await prisma.user.create({
-      data: {
-        id: crypto.randomUUID(),
-        name,
-        email,
-      }
+    const newUser = await this.repository.createUser({
+      id: crypto.randomUUID(),
+      name,
+      email,
     })
-
-
-    return user
+    return newUser
   }
 } 

@@ -8,6 +8,7 @@ type Mutation {
 }
 
 type Query {
+  userById(id: String!): User!
   users: [User!]!
 }
 

@@ -1,29 +1,25 @@
-import "reflect-metadata";
-
-import path from "path"
+import './infrastructure/dotenv'
+import { createSchema } from './graphql/createSchema';
 import { ApolloServer } from "apollo-server"
-import { buildSchema } from "type-graphql"
-import { UserResolver } from './resolvers/UserResolver';
 import { PrismaClient } from "@prisma/client"
 
 export const prisma = new PrismaClient()
+const port = process.env.APP_PORT || 4000
+const schema = createSchema()
 
-async function main() {
-  const port = process.env.APP_PORT || 4000
-  const schema = await buildSchema({
-    resolvers: [
-      UserResolver
-    ],
-    emitSchemaFile: path.resolve(__dirname, 'schema.gql') // Este arquivo é onde é gerado os schemas automaticamente
-  }) 
-
+export const main = async () => {
+  const schema = await createSchema()
 
   const server = new ApolloServer({
-    schema, context: { prisma }
+    schema, context: () => ({ prisma })
   })
 
-  await server.listen({ port }, () => console.log(`Server running at http://localhost:${port} 🔥`)
-  )
+  if (process.env.NODE_ENV === 'test') {
+    return server
+  }
+
+  server.listen({ port }, () => console.log(`Server running at http://localhost:${port} 🔥`))
+  return server
 }
 
 
