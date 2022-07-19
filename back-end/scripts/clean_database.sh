@@ -9,9 +9,9 @@ rm -rf data/
 echo "Creating database container..."
 docker-compose up -d
 
-echo "loading..."
-
+echo "loading container..."
 sleep 5
+
 echo "Applying migrations..."
-sudo npx -v
+npm run migration
 

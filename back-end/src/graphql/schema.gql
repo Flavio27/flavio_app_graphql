@@ -13,7 +13,7 @@ type Query {
 }
 
 type User {
-  email: String
+  email: String!
   id: ID!
   name: String!
 }

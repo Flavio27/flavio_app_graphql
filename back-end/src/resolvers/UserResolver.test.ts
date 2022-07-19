@@ -87,7 +87,10 @@ describe('dummy', () => {
   ${'Aaaaaaaaabbbbbbbbbbccccc'}  |   ${'test@email.com'}    
   ${'Aaron Mraz'}                |   ${'aaaabbbccc'}
   ${12345679}                    |   ${'test@email.com'}
-  ${'Aaaaaaaaabbbbbbbbbbccccc'}  |   ${'aaaabbbccc'}    
+  ${'Aaaaaaaaabbbbbbbbbbccccc'}  |   ${'aaaabbbccc'}  
+  ${12123213}                    |   ${3123123123}
+  ${'a'}                         |   ${''}
+  ${''}                          |   ${'a'}     
   `
     ("Should return an error when try create a new user with wrong data", async ({ name, email }) => {
     // Arrange
