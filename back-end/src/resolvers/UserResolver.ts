@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
+import { UserInput } from '../models/User.validate';
 import { UserRepository } from '../repositories/userRepository/userRepository';
 import { User } from './../models/User';
 
@@ -23,10 +24,11 @@ export class UserResolver {
   }
 
   @Mutation(() => User)
-  async createUser(
-    @Arg('name') name: string,
-    @Arg('email') email: string
-  ) {
+  async createUser(@Arg("data")
+  {
+    name,
+    email,
+  }: UserInput): Promise<User> {
     const newUser = await this.repository.createUser({
       id: crypto.randomUUID(),
       name,

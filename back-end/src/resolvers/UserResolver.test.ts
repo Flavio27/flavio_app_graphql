@@ -56,19 +56,19 @@ describe('dummy', () => {
     expect(result.data?.userById).toEqual(user)
   });
 
-  test("Should create a newUser", async () => {
+  test("Should create a new user", async () => {
     // Arrange
     const server = await main()
 
     // Act
     const newUser = {
-    name: faker.name.findName(),
+    name: faker.name.firstName(),
     email: faker.internet.email()
   }
 
     const result = await server.executeOperation({
       query: `mutation {
-        createUser(email: "${newUser.email}", name: "${newUser.name}") {
+        createUser(data: { email: "${newUser.email}", name: "${newUser.name}" }) {
           email
           id
          name
@@ -81,5 +81,35 @@ describe('dummy', () => {
     expect(result.errors).toBe(undefined)
     expect(result.data?.createUser).toMatchObject(newUser)
   });
+
+  test.each`
+  name                           |   email
+  ${'Aaaaaaaaabbbbbbbbbbccccc'}  |   ${'test@email.com'}    
+  ${'Aaron Mraz'}                |   ${'aaaabbbccc'}
+  ${12345679}                    |   ${'test@email.com'}
+  ${'Aaaaaaaaabbbbbbbbbbccccc'}  |   ${'aaaabbbccc'}    
+  `
+    ("Should return an error when try create a new user with wrong data", async ({ name, email }) => {
+    // Arrange
+    const server = await main()
+
+    // Act
+    const result = await server.executeOperation({
+      query: `mutation {
+        createUser(data: { email: "${name}", name: "${email}" }) {
+          email
+          id
+         name
+        }
+      }
+      `
+    });
+  
+    // Assert
+    expect(result.errors).not.toBe(undefined)
+    expect(result.errors?.length).toBeGreaterThan(0)
+  });
+
+
  })
  
