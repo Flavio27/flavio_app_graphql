@@ -10,4 +10,7 @@ export class User {
   
   @Field()
   name: string;
+
+  @Field()
+  password: string;
 }

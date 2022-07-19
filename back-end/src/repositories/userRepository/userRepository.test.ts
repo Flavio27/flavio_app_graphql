@@ -10,7 +10,8 @@ describe('UserRepository', () => {
     const newUserData: User = {
       id: randomUUID(),
       name: faker.name.findName(),
-      email: faker.internet.email()
+      email: faker.internet.email(),
+      password: faker.internet.password()
     }
 
     // Act

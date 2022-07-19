@@ -11,5 +11,8 @@ export class UserInput {
   @Field()
   @IsEmail()
   email: string;
+  
+  @Field()
+  password: string;
 }
 

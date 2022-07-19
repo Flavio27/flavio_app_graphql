@@ -28,11 +28,13 @@ export class UserResolver {
   {
     name,
     email,
+    password,
   }: UserInput): Promise<User> {
     const newUser = await this.repository.createUser({
       id: crypto.randomUUID(),
       name,
       email,
+      password
     })
     return newUser
   }

@@ -24,7 +24,7 @@ describe('dummy', () => {
 
     // Act
     const result = await server.executeOperation({
-      query: `query users { users { id name email } }`
+      query: `query users { users { id name email password } }`
     });
     const allUsers = await new UserRepository().getUsers()
 
@@ -45,7 +45,8 @@ describe('dummy', () => {
                 userById(id: "${newUser.id}") {
                   id
                   name
-                 email
+                  email
+                  password
                 }
               }`
     });
@@ -63,15 +64,17 @@ describe('dummy', () => {
     // Act
     const newUser = {
     name: faker.name.firstName(),
-    email: faker.internet.email()
+    email: faker.internet.email(),
+    password: faker.internet.password(),
   }
 
     const result = await server.executeOperation({
       query: `mutation {
-        createUser(data: { email: "${newUser.email}", name: "${newUser.name}" }) {
+        createUser(data: { email: "${newUser.email}", name: "${newUser.name}", password: "${newUser.password}" }) {
           email
           id
-         name
+          name
+          password
         }
       }
       `
@@ -83,23 +86,23 @@ describe('dummy', () => {
   });
 
   test.each`
-  name                           |   email
-  ${'Aaaaaaaaabbbbbbbbbbccccc'}  |   ${'test@email.com'}    
-  ${'Aaron Mraz'}                |   ${'aaaabbbccc'}
-  ${12345679}                    |   ${'test@email.com'}
-  ${'Aaaaaaaaabbbbbbbbbbccccc'}  |   ${'aaaabbbccc'}  
-  ${12123213}                    |   ${3123123123}
-  ${'a'}                         |   ${''}
-  ${''}                          |   ${'a'}     
+  name                           |   email                 | password
+  ${'Aaaaaaaaabbbbbbbbbbccccc'}  |   ${'test@email.com'}   | ${'mFDJVqOJ7qLNGdo'}
+  ${'Aaron Mraz'}                |   ${'aaaabbbccc'}       | ${'mFDJVqOJ7qLNGdo'}
+  ${12345679}                    |   ${'test@email.com'}   | ${'mFDJVqOJ7qLNGdo'}
+  ${'Aaaaaaaaabbbbbbbbbbccccc'}  |   ${'aaaabbbccc'}       | ${'mFDJVqOJ7qLNGdo'}   
+  ${12123213}                    |   ${3123123123}         | ${'mFDJVqOJ7qLNGdo'}
+  ${'a'}                         |   ${''}                 | ${'mFDJVqOJ7qLNGdo'}
+  ${''}                          |   ${'a'}                | ${'mFDJVqOJ7qLNGdo'}     
   `
-    ("Should return an error when try create a new user with wrong data", async ({ name, email }) => {
+    ("Should return an error when try create a new user with wrong data", async ({ name, email, password }) => {
     // Arrange
     const server = await main()
 
     // Act
     const result = await server.executeOperation({
       query: `mutation {
-        createUser(data: { email: "${name}", name: "${email}" }) {
+        createUser(data: { email: "${name}", name: "${email}", password: "${password}" }) {
           email
           id
          name

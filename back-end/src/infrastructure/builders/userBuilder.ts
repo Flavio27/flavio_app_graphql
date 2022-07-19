@@ -10,6 +10,7 @@ export class UserBuilder {
     this.model.id = randomUUID()
     this.model.name = faker.name.findName()
     this.model.email = faker.internet.email()
+    this.model.password = faker.internet.password()
   }
 
   withId(id: string) {
@@ -24,6 +25,11 @@ export class UserBuilder {
 
   withEmail(email: string) {
     this.model.email = email
+    return this
+  }
+
+  withPassword(password: string) {
+    this.model.password = password
     return this
   }
 
