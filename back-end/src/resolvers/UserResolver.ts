@@ -34,7 +34,8 @@ export class UserResolver {
       id: crypto.randomUUID(),
       name,
       email,
-      password
+      password,
+      created_at: new Date()
     })
     return newUser
   }

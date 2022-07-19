@@ -11,7 +11,8 @@ describe('UserRepository', () => {
       id: randomUUID(),
       name: faker.name.findName(),
       email: faker.internet.email(),
-      password: faker.internet.password()
+      password: faker.internet.password(),
+      created_at: new Date()
     }
 
     // Act

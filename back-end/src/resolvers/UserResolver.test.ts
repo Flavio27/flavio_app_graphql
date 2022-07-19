@@ -24,12 +24,13 @@ describe('dummy', () => {
 
     // Act
     const result = await server.executeOperation({
-      query: `query users { users { id name email password } }`
+      query: `query users { users { id name email password created_at } }`
     });
     const allUsers = await new UserRepository().getUsers()
 
     // Assert
-    expect(result.data?.users).toEqual(allUsers)
+    
+    expect(result.data?.users).toEqual(JSON.parse(JSON.stringify(allUsers)))
   });
 
   test("Should get user by ID", async () => {
@@ -47,6 +48,7 @@ describe('dummy', () => {
                   name
                   email
                   password
+                  created_at
                 }
               }`
     });
@@ -54,7 +56,7 @@ describe('dummy', () => {
 
     // Assert
     expect(result.errors).toBe(undefined)
-    expect(result.data?.userById).toEqual(user)
+    expect(result.data?.userById).toEqual(JSON.parse(JSON.stringify(user)))
   });
 
   test("Should create a new user", async () => {
@@ -105,7 +107,7 @@ describe('dummy', () => {
         createUser(data: { email: "${name}", name: "${email}", password: "${password}" }) {
           email
           id
-         name
+          name
         }
       }
       `
