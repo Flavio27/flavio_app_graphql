@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
-import { UserInput } from '../models/User.validate';
+import { UserInput } from '../models/User.input';
 import { UserRepository } from '../repositories/userRepository/userRepository';
 import { User } from './../models/User';
 

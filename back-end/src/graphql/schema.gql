@@ -9,10 +9,39 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 scalar DateTime
 
 type Mutation {
+  createProduct(data: ProductInput!): Products!
   createUser(data: UserInput!): User!
 }
 
+input ProductInput {
+  barcode: Float!
+  code: String!
+  description: String!
+  type: ProductType!
+}
+
+"""Types of products"""
+enum ProductType {
+  ALIMENTO
+  HIGIENE
+  LIMPEZA
+  UTENSILIOS
+}
+
+type Products {
+  barcode: Int!
+  code: String!
+  description: String!
+  id: ID!
+  type: ProductType!
+}
+
 type Query {
+  productByBarcode(barcode: Int!): Products!
+  productByCode(code: String!): Products!
+  productByDescription(description: String!): Products!
+  productById(id: String!): Products!
+  products: [Products!]!
   userById(id: String!): User!
   users: [User!]!
 }

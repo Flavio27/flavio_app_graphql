@@ -10,10 +10,31 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// enum UserRoles {
+//   ADMIN
+//   MANAGER
+//   OPERATOR
+// }
+
 model User {
   id         String   @id
   email      String   @unique
   name       String
   password   String
   created_at DateTime @default(now())
+}
+
+enum ProductType {
+  ALIMENTO
+  LIMPEZA
+  HIGIENE
+  UTENSILIOS
+}
+
+model Products {
+  id          String      @id
+  code        String      @unique
+  barcode     Int
+  description String
+  type        ProductType
 }
