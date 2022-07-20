@@ -3,6 +3,7 @@ import faker from "faker";
 import { User } from "../../models/User";
 import { UserBuilder } from "../../infrastructure/builders/userBuilder";
 import { UserRepository } from "./userRepository";
+import { prisma } from "../..";
 
 describe('UserRepository', () => {
   test('It should create new a user', async() => {
@@ -30,10 +31,12 @@ describe('UserRepository', () => {
   test('It should returns all users', async () => {
     // Arrange
     const allUsers = await new UserRepository().getUsers()
+    const users = await prisma.user.findMany()
 
     // Assert
     expect(allUsers).not.toBe(null)
     expect(allUsers).not.toBe(undefined)
+    expect(allUsers).toEqual(users)
   });
 
   test('It should get a user by ID', async () => {

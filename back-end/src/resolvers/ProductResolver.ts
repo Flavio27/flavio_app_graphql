@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { Arg, Mutation, Query, Resolver, Int } from "type-graphql";
-import { Product } from '../models/Product';
+import { Product, ProductType } from '../models/Product';
 import { ProductInput } from '../models/Product.input';
 import { ProductRepository } from './../repositories/productRepository/productRepository';
 
@@ -59,7 +59,7 @@ export class ProductResolver {
       code,
       barcode,
       description,
-      type
+      type,
     })
     return newProduct
   }
