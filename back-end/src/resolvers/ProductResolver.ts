@@ -1,20 +1,20 @@
 import crypto from 'node:crypto';
 import { Arg, Mutation, Query, Resolver, Int } from "type-graphql";
-import { Products } from '../models/Products';
-import { ProductInput } from '../models/Products.input';
+import { Product } from '../models/Product';
+import { ProductInput } from '../models/Product.input';
 import { ProductRepository } from './../repositories/productRepository/productRepository';
 
 @Resolver()
 export class ProductResolver {
   private repository = new ProductRepository()
 
-  @Query(() => [Products])
+  @Query(() => [Product])
   async products() {
     const allProducts = await this.repository.getProducts()
     return allProducts
   }
 
-  @Query(() => Products)
+  @Query(() => Product)
   async productById(
     @Arg('id') id: string
   ) {
@@ -22,15 +22,15 @@ export class ProductResolver {
     return product
   }
 
-  @Query(() => Products)
+  @Query(() => Product)
   async productByCode(
     @Arg('code') code: string
   ) {
-    const product = await this.repository.getProductByID(code)
+    const product = await this.repository.getProductByCode(code)
     return product
   }
 
-  @Query(() => Products)
+  @Query(() => [Product])
   async productByBarcode(
     @Arg('barcode', type => Int) barcode: number 
   ) {
@@ -38,7 +38,7 @@ export class ProductResolver {
     return products
   }
 
-  @Query(() => Products)
+  @Query(() => [Product])
   async productByDescription(
     @Arg('description') description: string
   ) {
@@ -46,7 +46,7 @@ export class ProductResolver {
     return products
   }
 
-  @Mutation(() => Products)
+  @Mutation(() => Product)
   async createProduct(@Arg("data")
   {
     code,

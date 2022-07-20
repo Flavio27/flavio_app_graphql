@@ -14,7 +14,7 @@ registerEnumType(ProductType, {
 
 
 @ObjectType()
-export class Products {
+export class Product {
   @Field(type => ID)
   id: string;
 

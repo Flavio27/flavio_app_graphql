@@ -9,8 +9,16 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 scalar DateTime
 
 type Mutation {
-  createProduct(data: ProductInput!): Products!
+  createProduct(data: ProductInput!): Product!
   createUser(data: UserInput!): User!
+}
+
+type Product {
+  barcode: Int!
+  code: String!
+  description: String!
+  id: ID!
+  type: ProductType!
 }
 
 input ProductInput {
@@ -28,20 +36,12 @@ enum ProductType {
   UTENSILIOS
 }
 
-type Products {
-  barcode: Int!
-  code: String!
-  description: String!
-  id: ID!
-  type: ProductType!
-}
-
 type Query {
-  productByBarcode(barcode: Int!): Products!
-  productByCode(code: String!): Products!
-  productByDescription(description: String!): Products!
-  productById(id: String!): Products!
-  products: [Products!]!
+  productByBarcode(barcode: Int!): [Product!]!
+  productByCode(code: String!): Product!
+  productByDescription(description: String!): [Product!]!
+  productById(id: String!): Product!
+  products: [Product!]!
   userById(id: String!): User!
   users: [User!]!
 }

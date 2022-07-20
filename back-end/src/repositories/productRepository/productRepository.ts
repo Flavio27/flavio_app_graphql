@@ -1,5 +1,5 @@
 import { prisma } from "../.."
-import { Products, ProductType } from "../../models/Products"
+import { Product, ProductType } from "../../models/Product"
 
 export class ProductRepository {
   private repository = prisma.products
@@ -48,7 +48,7 @@ export class ProductRepository {
     })
   }
 
-  async createProduct(data: Products){
+  async createProduct(data: Product){
     return await this.repository.create({
       data
     })

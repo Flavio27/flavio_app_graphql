@@ -1,6 +1,6 @@
 import { IsInt, IsNumber, IsPositive, IsString, Length } from "class-validator";
 import { Field, InputType } from "type-graphql";
-import { ProductType } from "./Products";
+import { ProductType } from "./Product";
 
 @InputType()
 export class ProductInput {
