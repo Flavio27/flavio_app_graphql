@@ -1,8 +1,8 @@
 import "reflect-metadata";
-import { ProductResolver } from './../resolvers/ProductResolver';
 import path from "path"
 import { buildSchema } from "type-graphql"
-import { UserResolver } from "../resolvers/UserResolver"
+import { UserResolver } from "../resolvers/userResolver/UserResolver";
+import { ProductResolver } from "../resolvers/productResolver/ProductResolver";
 
 export const createSchema = () => 
   buildSchema({

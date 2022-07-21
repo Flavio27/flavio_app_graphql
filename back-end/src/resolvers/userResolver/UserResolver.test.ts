@@ -1,7 +1,7 @@
 import faker from 'faker';
-import { main } from "..";
-import { UserBuilder } from "../infrastructure/builders/userBuilder";
-import { UserRepository } from "../repositories/userRepository/userRepository";
+import { main } from "../../";
+import { UserBuilder } from "../../infrastructure/builders/userBuilder";
+import { UserRepository } from "../../repositories/userRepository/userRepository";
 
 describe('dummy', () => {
   test("Should verify server health", async () => {

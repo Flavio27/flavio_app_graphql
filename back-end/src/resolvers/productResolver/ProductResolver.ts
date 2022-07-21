@@ -1,8 +1,8 @@
 import crypto from 'node:crypto';
 import { Arg, Mutation, Query, Resolver, Int } from "type-graphql";
-import { Product, ProductType } from '../models/Product';
-import { ProductInput } from '../models/Product.input';
-import { ProductRepository } from './../repositories/productRepository/productRepository';
+import { Product, ProductType } from '../../models/Product';
+import { ProductInput } from '../../models/Product.input';
+import { ProductRepository } from '../../repositories/productRepository/productRepository';
 
 @Resolver()
 export class ProductResolver {
