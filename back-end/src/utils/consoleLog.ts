@@ -1,1 +1,1 @@
-export const consoleLog = (data: any) => console.log(JSON.stringify(data, null, 2))
+export const consoleLog = (data: unknown) => console.log(JSON.stringify(data, null, 2))
