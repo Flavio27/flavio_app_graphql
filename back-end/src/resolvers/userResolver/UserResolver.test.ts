@@ -4,7 +4,7 @@ import { UserBuilder } from "../../infrastructure/builders/userBuilder";
 import { UserRepository } from "../../repositories/userRepository/userRepository";
 
 describe('dummy', () => {
-  test("Should verify server health", async () => {
+  test("It should verify server health", async () => {
     // Arrange
     const server = await main()
 
@@ -18,7 +18,7 @@ describe('dummy', () => {
     expect(result.errors).toBeTruthy();
   });
  
-  test("Should get all users from query", async () => {
+  test("It should get all users from query", async () => {
     // Arrange
     const server = await main()
 
@@ -33,7 +33,7 @@ describe('dummy', () => {
     expect(result.data?.users).toEqual(JSON.parse(JSON.stringify(allUsers)))
   });
 
-  test("Should get user by ID", async () => {
+  test("It Should get user by ID", async () => {
     // Arrange 
     const server = await main()
 
@@ -59,7 +59,7 @@ describe('dummy', () => {
     expect(result.data?.userById).toEqual(JSON.parse(JSON.stringify(user)))
   });
 
-  test("Should create a new user", async () => {
+  test("It should create a new user", async () => {
     // Arrange
     const server = await main()
 
@@ -97,7 +97,7 @@ describe('dummy', () => {
   ${'a'}                         |   ${''}                 | ${'mFDJVqOJ7qLNGdo'}
   ${''}                          |   ${'a'}                | ${'mFDJVqOJ7qLNGdo'}     
   `
-    ("Should return an error when try create a new user with wrong data", async ({ name, email, password }) => {
+    ("It should return an error when try create a new user with wrong data", async ({ name, email, password }) => {
     // Arrange
     const server = await main()
 
@@ -114,7 +114,7 @@ describe('dummy', () => {
     });
   
     // Assert
-    expect(result.errors).not.toBe(undefined)
+    expect(result.errors).toBeTruthy()
     expect(result.errors?.length).toBeGreaterThan(0)
   });
 
