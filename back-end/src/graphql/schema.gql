@@ -3,6 +3,13 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+type ClientUser {
+  created_at: DateTime!
+  email: String!
+  id: ID!
+  name: String!
+}
+
 """
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
 """
@@ -10,7 +17,7 @@ scalar DateTime
 
 type Mutation {
   createProduct(data: ProductInput!): Product!
-  createUser(data: UserInput!): User!
+  createUser(data: UserInput!): String!
 }
 
 type Product {
@@ -42,20 +49,18 @@ type Query {
   productByDescription(description: String!): [Product!]!
   productById(id: String!): Product!
   products: [Product!]!
-  userById(id: String!): User!
-  users: [User!]!
-}
-
-type User {
-  created_at: DateTime!
-  email: String!
-  id: ID!
-  name: String!
-  password: String!
+  userById(id: String!): ClientUser!
+  userLogin(data: UserLoginInput!): String!
+  users: [ClientUser!]!
 }
 
 input UserInput {
   email: String!
   name: String!
+  password: String!
+}
+
+input UserLoginInput {
+  email: String!
   password: String!
 }

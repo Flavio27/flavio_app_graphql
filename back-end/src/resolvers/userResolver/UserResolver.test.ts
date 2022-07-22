@@ -3,7 +3,7 @@ import { main } from "../../";
 import { UserBuilder } from "../../infrastructure/builders/userBuilder";
 import { UserRepository } from "../../repositories/userRepository/userRepository";
 
-describe('dummy', () => {
+describe('UserResolver.ts', () => {
   test("It should verify server health", async () => {
     // Arrange
     const server = await main()

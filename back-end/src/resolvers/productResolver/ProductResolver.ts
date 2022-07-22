@@ -54,6 +54,9 @@ export class ProductResolver {
     description,
     type,
   }: ProductInput) {
+    const productAlreadyExists = await this.repository.getProductByCode(code)
+    if (productAlreadyExists) throw new Error('Product code already exists!')
+    
     const newProduct = await this.repository.createProduct({
       id: crypto.randomUUID(),
       code,
