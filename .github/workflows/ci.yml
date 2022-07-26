@@ -25,5 +25,7 @@ jobs:
         with:
           node-version: '16'
           cache: 'npm'
-      - run: npm install
-      - run: npm test
+          cache-dependency-path: back-end/package-lock.json
+      - uses: actions/checkout@v2
+      - name: Running tests
+        run: docker-compose -f docker-compose.test.yml --env-file=.env.test run --rm test
