@@ -4,6 +4,7 @@ import { User } from "../../models/User";
 import { UserBuilder } from "../../infrastructure/builders/userBuilder";
 import { UserRepository } from "./userRepository";
 import { prisma } from "../..";
+import { userDto } from "../../dtos/userDto";
 
 describe('UserRepository', () => {
   test('It should create new a user', async() => {
@@ -24,14 +25,21 @@ describe('UserRepository', () => {
     expect(user).not.toBe(null)
     expect(user).not.toBe(undefined)
     expect(newUser).toEqual(newUserData)
-    expect(newUser).toEqual(user)
+    expect(newUser.email).toEqual(user?.email)
 
   });
 
   test('It should returns all users', async () => {
     // Arrange
     const allUsers = await new UserRepository().getUsers()
-    const users = await prisma.user.findMany()
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        created_at: true,
+      }
+    })
 
     // Assert
     expect(allUsers).not.toBe(null)
@@ -50,7 +58,7 @@ describe('UserRepository', () => {
     const user = await new UserRepository().getUserByID(newUser.id)
 
     // Assert
-    expect(newUser).toEqual(user)
+    expect(userDto(newUser)).toEqual(user)
 
   });
 })

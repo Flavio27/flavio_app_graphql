@@ -1,7 +1,18 @@
+import { ApolloServer } from 'apollo-server';
 import faker from 'faker';
 import { main } from "../../";
 import { UserBuilder } from "../../infrastructure/builders/userBuilder";
+import { ClientUser } from '../../models/User';
 import { UserRepository } from "../../repositories/userRepository/userRepository";
+import { AxiosGraphql } from '../../utils/axiosRequest';
+import { decodedToken } from '../../utils/decodedToken';
+import { jsonParser } from '../../utils/jsonParser';
+
+let server: ApolloServer
+
+beforeAll( async () => {
+  server = await main()
+})
 
 describe('UserResolver.ts', () => {
   test("It should verify server health", async () => {
@@ -18,25 +29,47 @@ describe('UserResolver.ts', () => {
     expect(result.errors).toBeTruthy();
   });
  
-  test("It should get all users from query", async () => {
+  test("It should get all users from query with token", async () => {
     // Arrange
-    const server = await main()
+    const userEmail = faker.internet.email()
+    const userPass = faker.internet.password()
+
+    await new UserBuilder()
+    .withEmail(userEmail)
+    .withPassword(userPass)
+    .insert()
+
+    const login = await server.executeOperation({
+      query: `query login{
+        userLogin(data: {
+          email: "${userEmail}",
+          password: "${userPass}"
+        })
+      }`,
+    });
+
+    const token = login.data?.userLogin
 
     // Act
-    const result = await server.executeOperation({
-      query: `query users { users { id name email password created_at } }`
-    });
+    const query = `
+      query {
+        users {
+          id
+          name
+          email
+          created_at
+          }
+        }
+      `
+    
+    const { data: { data: { users }}} = await AxiosGraphql({ query, token })
     const allUsers = await new UserRepository().getUsers()
 
     // Assert
-    
-    expect(result.data?.users).toEqual(JSON.parse(JSON.stringify(allUsers)))
+    expect(users).toEqual(jsonParser(allUsers))
   });
 
   test("It Should get user by ID", async () => {
-    // Arrange 
-    const server = await main()
-
     // Act
     const newUser = await new UserBuilder()
    .insert()
@@ -47,7 +80,6 @@ describe('UserResolver.ts', () => {
                   id
                   name
                   email
-                  password
                   created_at
                 }
               }`
@@ -60,8 +92,6 @@ describe('UserResolver.ts', () => {
   });
 
   test("It should create a new user", async () => {
-    // Arrange
-    const server = await main()
 
     // Act
     const newUser = {
@@ -72,19 +102,18 @@ describe('UserResolver.ts', () => {
 
     const result = await server.executeOperation({
       query: `mutation {
-        createUser(data: { email: "${newUser.email}", name: "${newUser.name}", password: "${newUser.password}" }) {
-          email
-          id
-          name
-          password
-        }
+        createUser(data: { email: "${newUser.email}", name: "${newUser.name}", password: "${newUser.password}" })
       }
       `
     });
 
     // Assert
     expect(result.errors).toBe(undefined)
-    expect(result.data?.createUser).toMatchObject(newUser)
+    const decodedResult = decodedToken(result.data?.createUser) as ClientUser
+    const user = await new UserRepository().getUserByEmail(decodedResult.email)
+
+    expect(user?.email).toEqual(newUser.email)
+    expect(decodedResult.email).toEqual(newUser.email)
   });
 
   test.each`
@@ -118,6 +147,32 @@ describe('UserResolver.ts', () => {
     expect(result.errors?.length).toBeGreaterThan(0)
   });
 
+  test("It should do a user login", async () => {
+    // Arrange
+    const password = 'PasswordTest123'
+    const newUser = await new UserBuilder()
+    .withPassword(password)
+    .insert()
 
- })
+    const query = `
+      query {
+        userLogin(data: {
+          email: "${newUser.email}",
+         password: "${password}"
+        })
+      }
+    `
+
+    // Act
+    const { data, errors } = await server.executeOperation({
+      query
+    })
+    const decodedData = decodedToken(data?.userLogin) as ClientUser
+
+    // Assert
+    expect(errors).toBeFalsy()
+    expect(decodedData.email).toEqual(newUser.email)
+  })
+
+})
  

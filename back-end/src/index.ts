@@ -11,13 +11,21 @@ export const main = async () => {
   const schema = await createSchema()
 
   const server = new ApolloServer({
-    schema, context: () => ({ prisma })
+    schema, 
+    context: ({ req }) => {
+      const context = {
+        prisma,
+        req
+      }
+
+      return context
+    }
   })
 
   if (process.env.NODE_ENV === 'test') {
     return server
   }
-
+  
   server.listen({ port }, () => console.log(`Server running at http://localhost:${port} 🔥`))
   return server
 }

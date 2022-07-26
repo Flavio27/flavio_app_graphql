@@ -1,7 +1,8 @@
+import { randomUUID } from 'crypto';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'node:crypto';
-import { Arg, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Authorized, Mutation, Query, Resolver } from "type-graphql";
 import { userDto } from '../../dtos/userDto';
 import { UserLoginInput } from '../../graphql/inputs/UserLoginInput';
 import { UserInput } from '../../models/User.input';
@@ -12,6 +13,7 @@ import { ClientUser } from './../../models/User';
 export class UserResolver {
   private repository = new UserRepository()
 
+  @Authorized("ADMIN", "MODERATOR")
   @Query(() => [ClientUser])
   async users() {
     const allUsers = await this.repository.getUsers()
@@ -38,7 +40,15 @@ export class UserResolver {
     const isMatch = bcrypt.compareSync(password, user.password);
     if (!isMatch) throw new Error('Email or password incorrect!');
 
-    const encodeResult = jwt.sign(userDto(user), "supersecret")
+    const encodeResult = jwt.sign(
+      userDto(user),
+      `${process.env.JWT_SECRET_KEY}`,
+      {
+        subject: user.id,
+        expiresIn: "60s"
+      }
+    )
+
     return encodeResult
   }
 
@@ -60,7 +70,7 @@ export class UserResolver {
       created_at: new Date()
     })
 
-    const encodeResult = jwt.sign(userDto(user), "supersecret")
+    const encodeResult = jwt.sign(userDto(user), `${process.env.JWT_SECRET_KEY}`)
     
     return encodeResult
   }
