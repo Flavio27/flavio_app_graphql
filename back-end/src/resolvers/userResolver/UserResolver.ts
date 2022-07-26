@@ -1,21 +1,26 @@
+import { randomUUID } from 'crypto';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import crypto from 'node:crypto';
-import { Arg, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Authorized, Mutation, Query, Resolver } from "type-graphql";
+import { userDto } from '../../dtos/userDto';
+import { UserLoginInput } from '../../graphql/inputs/UserLoginInput';
 import { UserInput } from '../../models/User.input';
 import { UserRepository } from '../../repositories/userRepository/userRepository';
-import { User } from './../../models/User';
-
+import { ClientUser } from './../../models/User';
 
 @Resolver()
 export class UserResolver {
   private repository = new UserRepository()
 
-  @Query(() => [User])
+  @Authorized("ADMIN", "MODERATOR")
+  @Query(() => [ClientUser])
   async users() {
     const allUsers = await this.repository.getUsers()
     return allUsers
   }
 
-  @Query(() => User)
+  @Query(() => ClientUser)
   async userById(
     @Arg('id') id: string
   ) {
@@ -23,20 +28,50 @@ export class UserResolver {
     return user
   }
 
-  @Mutation(() => User)
+  @Query(() => String)
+  async userLogin(@Arg("data")
+  {
+    email,
+    password
+  }: UserLoginInput): Promise<String> {
+    const user = await this.repository.getUserByEmail(email)
+    if (!user) throw new Error('Email or password incorrect!');
+
+    const isMatch = bcrypt.compareSync(password, user.password);
+    if (!isMatch) throw new Error('Email or password incorrect!');
+
+    const encodeResult = jwt.sign(
+      userDto(user),
+      `${process.env.JWT_SECRET_KEY}`,
+      {
+        subject: user.id,
+        expiresIn: "60s"
+      }
+    )
+
+    return encodeResult
+  }
+
+  @Mutation(() => String)
   async createUser(@Arg("data")
   {
     name,
     email,
     password,
-  }: UserInput): Promise<User> {
-    const newUser = await this.repository.createUser({
+  }: UserInput): Promise<String> {
+    const userAlreadyExists = await this.repository.getUserByEmail(email)
+    if (userAlreadyExists) throw new Error('This user already exists.');
+
+    const user = await this.repository.createUser({
       id: crypto.randomUUID(),
       name,
       email,
-      password,
+      password: bcrypt.hashSync(password, 3),
       created_at: new Date()
     })
-    return newUser
+
+    const encodeResult = jwt.sign(userDto(user), `${process.env.JWT_SECRET_KEY}`)
+    
+    return encodeResult
   }
 } 

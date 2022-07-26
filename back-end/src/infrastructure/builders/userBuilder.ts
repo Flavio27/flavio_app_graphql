@@ -1,7 +1,8 @@
-import { randomUUID } from 'node:crypto';
-import { User } from '../../models/User';
+import bcrypt from 'bcrypt';
 import faker from 'faker';
+import { randomUUID } from 'node:crypto';
 import { prisma } from '../..';
+import { User } from '../../models/User';
 
 export class UserBuilder {
   private model = new User()
@@ -10,7 +11,7 @@ export class UserBuilder {
     this.model.id = randomUUID()
     this.model.name = faker.name.findName()
     this.model.email = faker.internet.email()
-    this.model.password = faker.internet.password()
+    this.model.password = bcrypt.hashSync(faker.internet.password(), 3)
   }
 
   withId(id: string) {
@@ -29,7 +30,7 @@ export class UserBuilder {
   }
 
   withPassword(password: string) {
-    this.model.password = password
+    this.model.password = bcrypt.hashSync(password, 3)
     return this
   }
 

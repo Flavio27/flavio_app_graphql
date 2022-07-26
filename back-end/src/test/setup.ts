@@ -11,5 +11,6 @@ beforeAll(async () => {
 
 afterAll(async () => {
   // await prisma.user.deleteMany()
+  // await prisma.products.deleteMany()
   await prisma.$disconnect()
 })

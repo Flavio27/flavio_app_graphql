@@ -18,3 +18,18 @@ export class User {
   created_at: Date;
   
 }
+
+@ObjectType()
+export class ClientUser {
+  @Field(_type => ID)
+  id: string;
+
+  @Field()
+  name: string;
+
+  @Field()
+  email: string;
+  
+  @Field()
+  created_at: Date;
+}
