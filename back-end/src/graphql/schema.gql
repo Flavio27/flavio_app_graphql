@@ -49,9 +49,16 @@ type Query {
   productByDescription(description: String!): [Product!]!
   productById(id: String!): Product!
   products: [Product!]!
+  refreshToken(id: String!): String!
   userById(id: String!): ClientUser!
-  userLogin(data: UserLoginInput!): String!
+  userLogin(data: UserLoginInput!): UserLoginType!
   users: [ClientUser!]!
+}
+
+type RefreshTokenType {
+  expiresIn: Float!
+  id: String!
+  userId: String!
 }
 
 input UserInput {
@@ -63,4 +70,9 @@ input UserInput {
 input UserLoginInput {
   email: String!
   password: String!
+}
+
+type UserLoginType {
+  refreshToken: RefreshTokenType!
+  token: String!
 }

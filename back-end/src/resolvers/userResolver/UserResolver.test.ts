@@ -44,11 +44,18 @@ describe('UserResolver.ts', () => {
         userLogin(data: {
           email: "${userEmail}",
           password: "${userPass}"
-        })
+        }){
+          token,
+          refreshToken {
+            id
+            userId
+            expiresIn
+          }
+        }
       }`,
     });
 
-    const token = login.data?.userLogin
+    const userToken = login.data?.userLogin?.token
 
     // Act
     const query = `
@@ -62,11 +69,30 @@ describe('UserResolver.ts', () => {
         }
       `
     
-    const { data: { data: { users }}} = await AxiosGraphql({ query, token })
+    const result = await AxiosGraphql({ query, token: userToken })
     const allUsers = await new UserRepository().getUsers()
 
     // Assert
-    expect(users).toEqual(jsonParser(allUsers))
+    expect(result.data.data.users).toEqual(jsonParser(allUsers))
+  });
+
+  test("It return token is missing when get all Users without token", async () => {
+    // Arrange
+    const query = `
+      query {
+        users {
+          id
+          name
+          email
+          created_at
+          }
+        }
+      `
+    
+    const result = await AxiosGraphql({ query })
+
+    // Assert
+    expect(result.data.errors[0].message).toEqual('Token is missing')
   });
 
   test("It Should get user by ID", async () => {
@@ -159,7 +185,14 @@ describe('UserResolver.ts', () => {
         userLogin(data: {
           email: "${newUser.email}",
          password: "${password}"
-        })
+        }){
+          token,
+          refreshToken {
+            id
+            userId
+            expiresIn
+          }
+        }
       }
     `
 
@@ -167,7 +200,8 @@ describe('UserResolver.ts', () => {
     const { data, errors } = await server.executeOperation({
       query
     })
-    const decodedData = decodedToken(data?.userLogin) as ClientUser
+    
+    const decodedData = decodedToken(data?.userLogin?.token) as ClientUser
 
     // Assert
     expect(errors).toBeFalsy()

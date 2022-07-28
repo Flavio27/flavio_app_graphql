@@ -1,13 +1,21 @@
-import { randomUUID } from 'crypto';
+import { RefreshToken } from '@prisma/client';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import crypto from 'node:crypto';
-import { Arg, Authorized, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Authorized , Mutation, Query, Resolver } from "type-graphql";
 import { userDto } from '../../dtos/userDto';
 import { UserLoginInput } from '../../graphql/inputs/UserLoginInput';
 import { UserInput } from '../../models/User.input';
+import { UserLoginType } from '../../models/UserLogin';
+import { RefreshTokenRepository } from '../../repositories/refreshTokenRepository/refreshTokenRepository';
 import { UserRepository } from '../../repositories/userRepository/userRepository';
+import { encodeToken } from '../../utils/encodeToken';
+import { refreshTokenExpirationTime, tokenExpirationTime } from '../../utils/variables';
 import { ClientUser } from './../../models/User';
+
+interface IUserLoginInput {
+  token: String
+  refreshToken: RefreshToken
+}
 
 @Resolver()
 export class UserResolver {
@@ -28,28 +36,37 @@ export class UserResolver {
     return user
   }
 
-  @Query(() => String)
+  @Query(() => UserLoginType)
   async userLogin(@Arg("data")
   {
     email,
     password
-  }: UserLoginInput): Promise<String> {
+  }: UserLoginInput): Promise<IUserLoginInput> {
     const user = await this.repository.getUserByEmail(email)
     if (!user) throw new Error('Email or password incorrect!');
 
     const isMatch = bcrypt.compareSync(password, user.password);
     if (!isMatch) throw new Error('Email or password incorrect!');
 
-    const encodeResult = jwt.sign(
-      userDto(user),
-      `${process.env.JWT_SECRET_KEY}`,
-      {
+    const token = encodeToken({
+      payload: userDto(user),
+      options:{
         subject: user.id,
-        expiresIn: "60s"
-      }
-    )
+        expiresIn: tokenExpirationTime
+    }})
 
-    return encodeResult
+    const refreshTokenRepository = new RefreshTokenRepository()
+    const refreshToken = await refreshTokenRepository.getRefreshTokenByUserId(user.id)
+
+    const expiresIn = refreshTokenExpirationTime
+
+    if (!refreshToken){
+      const refreshToken = await refreshTokenRepository.createRefreshToken(user.id, expiresIn)
+      return {token, refreshToken}
+    }
+
+    const newRefreshToken = await refreshTokenRepository.renewRefreshToken(user.id, expiresIn)
+    return {token, refreshToken: newRefreshToken}
   }
 
   @Mutation(() => String)
@@ -70,8 +87,10 @@ export class UserResolver {
       created_at: new Date()
     })
 
-    const encodeResult = jwt.sign(userDto(user), `${process.env.JWT_SECRET_KEY}`)
-    
-    return encodeResult
+    const token = encodeToken({
+      payload: userDto(user),
+    })
+
+    return token
   }
 } 
