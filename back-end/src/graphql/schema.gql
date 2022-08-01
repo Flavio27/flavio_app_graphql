@@ -44,12 +44,14 @@ enum ProductType {
 }
 
 type Query {
+  confirmEmail(code: Int!, userId: String!): Boolean!
   productByBarcode(barcode: Int!): [Product!]!
   productByCode(code: String!): Product!
   productByDescription(description: String!): [Product!]!
   productById(id: String!): Product!
   products: [Product!]!
   refreshToken(id: String!): String!
+  renewConfirmCode(userId: String!): Boolean!
   userById(id: String!): ClientUser!
   userLogin(data: UserLoginInput!): UserLoginType!
   users: [ClientUser!]!

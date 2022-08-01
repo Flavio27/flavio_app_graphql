@@ -5,13 +5,15 @@ import { UserResolver } from "../resolvers/userResolver/UserResolver";
 import { ProductResolver } from "../resolvers/productResolver/ProductResolver";
 import { RefreshTokenResolver } from "../resolvers/refreshTokenResolver/RefreshTokenResolver";
 import { authChecker } from "../utils/authChecker";
+import { ConfirmEmailResolver } from "../resolvers/confirmEmailResolver/ConfirmEmailResolver";
 
 export const createSchema = () => 
   buildSchema({
     resolvers: [
       UserResolver,
       ProductResolver,
-      RefreshTokenResolver
+      RefreshTokenResolver,
+      ConfirmEmailResolver
     ],
     authChecker: authChecker,
     authMode: "null",

@@ -12,6 +12,7 @@ export class UserBuilder {
     this.model.name = faker.name.findName()
     this.model.email = faker.internet.email()
     this.model.password = bcrypt.hashSync(faker.internet.password(), 3)
+    this.model.confirmed = false
   }
 
   withId(id: string) {
@@ -31,6 +32,11 @@ export class UserBuilder {
 
   withPassword(password: string) {
     this.model.password = bcrypt.hashSync(password, 3)
+    return this
+  }
+
+  withConfirmed(confirmed: boolean) {
+    this.model.confirmed = confirmed
     return this
   }
 
