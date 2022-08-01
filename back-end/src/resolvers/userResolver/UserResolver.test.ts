@@ -37,6 +37,7 @@ describe('UserResolver.ts', () => {
     await new UserBuilder()
     .withEmail(userEmail)
     .withPassword(userPass)
+    .withConfirmed(true)
     .insert()
 
     const login = await server.executeOperation({
@@ -98,7 +99,8 @@ describe('UserResolver.ts', () => {
   test("It Should get user by ID", async () => {
     // Act
     const newUser = await new UserBuilder()
-   .insert()
+    .withConfirmed(true)
+    .insert()
    
     const result = await server.executeOperation({
       query: `query userById {
@@ -114,7 +116,9 @@ describe('UserResolver.ts', () => {
 
     // Assert
     expect(result.errors).toBe(undefined)
-    expect(result.data?.userById).toEqual(JSON.parse(JSON.stringify(user)))
+    expect(result.data?.userById?.email).toBeTruthy()
+    expect(result.data?.userById?.email).toEqual(user?.email)
+    expect(result.data?.userById?.id).toEqual(user?.id)
   });
 
   test("It should create a new user", async () => {
@@ -178,6 +182,7 @@ describe('UserResolver.ts', () => {
     const password = 'PasswordTest123'
     const newUser = await new UserBuilder()
     .withPassword(password)
+    .withConfirmed(true)
     .insert()
 
     const query = `

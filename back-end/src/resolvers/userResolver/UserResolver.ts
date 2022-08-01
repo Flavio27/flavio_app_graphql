@@ -1,7 +1,7 @@
 import { RefreshToken } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import crypto from 'node:crypto';
-import { Arg, Authorized , Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Authorized, Mutation, Query, Resolver } from "type-graphql";
 import { userDto } from '../../dtos/userDto';
 import { UserLoginInput } from '../../graphql/inputs/UserLoginInput';
 import { UserInput } from '../../models/User.input';
@@ -9,8 +9,11 @@ import { UserLoginType } from '../../models/UserLogin';
 import { RefreshTokenRepository } from '../../repositories/refreshTokenRepository/refreshTokenRepository';
 import { UserRepository } from '../../repositories/userRepository/userRepository';
 import { encodeToken } from '../../utils/encodeToken';
-import { refreshTokenExpirationTime, tokenExpirationTime } from '../../utils/variables';
+import { randomCode } from '../../utils/randomCode';
+import { sendEmail } from '../../utils/sendEmail';
+import { confirmEmailCodeExpirationTime, refreshTokenExpirationTime, tokenExpirationTime } from '../../utils/variables';
 import { ClientUser } from './../../models/User';
+import { ConfirmUserRepository } from './../../repositories/confirmUserRepository/confirmUserRepository';
 
 interface IUserLoginInput {
   token: String
@@ -59,11 +62,16 @@ export class UserResolver {
     const refreshToken = await refreshTokenRepository.getRefreshTokenByUserId(user.id)
 
     const expiresIn = refreshTokenExpirationTime
+    
+    if (!user.confirmed){
+     throw new Error('You must confirm your email')
+    }
 
     if (!refreshToken){
       const refreshToken = await refreshTokenRepository.createRefreshToken(user.id, expiresIn)
       return {token, refreshToken}
     }
+
 
     const newRefreshToken = await refreshTokenRepository.renewRefreshToken(user.id, expiresIn)
     return {token, refreshToken: newRefreshToken}
@@ -84,9 +92,16 @@ export class UserResolver {
       name,
       email,
       password: bcrypt.hashSync(password, 3),
-      created_at: new Date()
+      created_at: new Date(),
+      confirmed: false,
     })
 
+
+    const code = randomCode()
+    await new ConfirmUserRepository()
+    .createConfirmCode(user.id, code, confirmEmailCodeExpirationTime )
+    await sendEmail(email, code);
+    
     const token = encodeToken({
       payload: userDto(user),
     })

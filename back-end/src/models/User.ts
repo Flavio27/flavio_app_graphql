@@ -16,6 +16,9 @@ export class User {
 
   @Field()
   created_at: Date;
+
+  @Field()
+  confirmed: boolean;
   
 }
 

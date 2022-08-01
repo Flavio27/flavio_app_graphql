@@ -14,7 +14,8 @@ describe('UserRepository', () => {
       name: faker.name.findName(),
       email: faker.internet.email(),
       password: faker.internet.password(),
-      created_at: new Date()
+      created_at: new Date(),
+      confirmed: false,
     }
 
     // Act
@@ -58,7 +59,8 @@ describe('UserRepository', () => {
     const user = await new UserRepository().getUserByID(newUser.id)
 
     // Assert
-    expect(userDto(newUser)).toEqual(user)
+    expect(newUser.id).toEqual(user!.id)
+    expect(newUser.email).toEqual(user!.email)
 
   });
 })

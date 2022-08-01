@@ -1,6 +1,10 @@
 import { prisma } from "../.."
 import { User } from "../../models/User"
 
+interface IUpdateUser{
+  data: Partial<User>
+  where: Partial<User>
+}
 export class UserRepository {
   private repository = prisma.user
   
@@ -22,6 +26,7 @@ export class UserRepository {
         name: true,
         email: true,
         created_at: true,
+        confirmed: true,
       },
         where: {
           id
@@ -40,6 +45,13 @@ export class UserRepository {
   async createUser(data: User){
     return await this.repository.create({
       data
+    })
+  }
+
+  async updateUser(data: IUpdateUser){
+    return await this.repository.update({
+      where: data.where,
+      data: data.data
     })
   }
 
