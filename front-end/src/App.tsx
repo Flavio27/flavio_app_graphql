@@ -1,5 +1,11 @@
 import { gql, useQuery } from '@apollo/client'
-import { NewUserForm } from './components/NewUserForm';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
+import { Login } from './pages/Login';
+import { SignUp } from './pages/SignUp';
 
 type User = {
   id: string;
@@ -29,12 +35,14 @@ function App() {
   }
 
   return (
-    <div>
-      <ul>
-        {data?.users.map(({name, email, id}) => <li key={id}>Nome: {name} - Email: {email}</li>)}
-      </ul>
-      <NewUserForm/>
-    </div>
+    <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Login />}>
+        <Route index element={<Login />} />
+      </Route>
+        <Route path="signup" element={<SignUp />} />
+    </Routes>
+  </BrowserRouter>
   )
 }
 
