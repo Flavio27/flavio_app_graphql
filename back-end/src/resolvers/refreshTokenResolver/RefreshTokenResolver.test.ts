@@ -63,7 +63,7 @@ describe('RefreshTokenResolver.test', () => {
 
     // Act
     const user = await new UserBuilder().insert()
-    const refreshToken = await refreshTokenRepository.createRefreshToken(user.id, refreshTokenExpirationTime)
+    const refreshToken = await refreshTokenRepository.createRefreshToken(user.id, refreshTokenExpirationTime())
 
     const query = `query { refreshToken(id: "${refreshToken.id}")}`
     

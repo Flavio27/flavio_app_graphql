@@ -4,9 +4,12 @@ import { RefreshTokenType } from "./RefreshToken"
 
 @ObjectType()
 export class UserLoginType {
-  @Field()
-  token: string
+  @Field({ nullable: true })
+  token?: string
 
-  @Field()
-  refreshToken: RefreshTokenType
+  @Field({ nullable: true })
+  refreshToken?: RefreshTokenType
+
+  @Field({ nullable: true })
+  confirmed?: Boolean
 }

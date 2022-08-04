@@ -10,7 +10,7 @@ export class ConfirmCodeBuilder {
   constructor() {
     this.model.id = randomUUID()
     this.model.code = randomCode()
-    this.model.expiresIn = confirmEmailCodeExpirationTime
+    this.model.expiresIn = confirmEmailCodeExpirationTime()
     this.model.userId = ''
   }
 

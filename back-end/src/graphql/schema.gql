@@ -44,7 +44,7 @@ enum ProductType {
 }
 
 type Query {
-  confirmEmail(code: Int!, userId: String!): Boolean!
+  confirmEmail(code: Int!, email: String!): UserLoginType!
   productByBarcode(barcode: Int!): [Product!]!
   productByCode(code: String!): Product!
   productByDescription(description: String!): [Product!]!
@@ -75,6 +75,7 @@ input UserLoginInput {
 }
 
 type UserLoginType {
-  refreshToken: RefreshTokenType!
-  token: String!
+  confirmed: Boolean
+  refreshToken: RefreshTokenType
+  token: String
 }

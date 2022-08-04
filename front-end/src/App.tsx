@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
 } from "react-router-dom";
+import { ConfirmEmail } from './pages/ConfirmEmail';
 import { Login } from './pages/Login';
 import { SignUp } from './pages/SignUp';
 
@@ -41,6 +42,7 @@ function App() {
         <Route index element={<Login />} />
       </Route>
         <Route path="signup" element={<SignUp />} />
+        <Route path="confirm-email" element={<ConfirmEmail />} />
     </Routes>
   </BrowserRouter>
   )

@@ -16,8 +16,9 @@ import { ClientUser } from './../../models/User';
 import { ConfirmUserRepository } from './../../repositories/confirmUserRepository/confirmUserRepository';
 
 interface IUserLoginInput {
-  token: String
-  refreshToken: RefreshToken
+  token?: String
+  refreshToken?: RefreshToken
+  confirmed?: Boolean
 }
 
 @Resolver()
@@ -61,10 +62,10 @@ export class UserResolver {
     const refreshTokenRepository = new RefreshTokenRepository()
     const refreshToken = await refreshTokenRepository.getRefreshTokenByUserId(user.id)
 
-    const expiresIn = refreshTokenExpirationTime
+    const expiresIn = refreshTokenExpirationTime()
     
     if (!user.confirmed){
-     throw new Error('You must confirm your email')
+      return { confirmed: user.confirmed }  
     }
 
     if (!refreshToken){
@@ -74,7 +75,7 @@ export class UserResolver {
 
 
     const newRefreshToken = await refreshTokenRepository.renewRefreshToken(user.id, expiresIn)
-    return {token, refreshToken: newRefreshToken}
+    return {token, refreshToken: newRefreshToken, confirmed: user.confirmed}
   }
 
   @Mutation(() => String)
@@ -96,10 +97,9 @@ export class UserResolver {
       confirmed: false,
     })
 
-
     const code = randomCode()
     await new ConfirmUserRepository()
-    .createConfirmCode(user.id, code, confirmEmailCodeExpirationTime )
+    .createConfirmCode(user.id, code, confirmEmailCodeExpirationTime() )
     await sendEmail(email, code);
     
     const token = encodeToken({

@@ -4,6 +4,8 @@ import { UserRepository } from './../../repositories/userRepository/userReposito
 import { ConfirmCodeBuilder } from './../../infrastructure/builders/confirmCodeBuilder';
 import { ApolloServer } from 'apollo-server';
 import { main } from '../..';
+import { ClientUser, User } from '../../models/User';
+import { decodedToken } from '../../utils/decodedToken';
 
 
 let server: ApolloServer
@@ -18,10 +20,17 @@ describe(('ConfirmEmailResolver'), () => {
   test('It should confirm a user email', async () => {
     // Arrange
     const { code, userId } = await new ConfirmCodeBuilder().insert()
-
+    const { email } = await new UserRepository().getUserByID(userId) as User
     const query = `
     query confirmEmail {
-      confirmEmail(code: ${code}, userId: "${userId}")
+      confirmEmail(code: ${code}, email: "${email}"){
+        token
+        refreshToken {
+          expiresIn
+          id
+          userId
+        }
+      }
     }
     `
 
@@ -31,22 +40,27 @@ describe(('ConfirmEmailResolver'), () => {
     })
 
     // Arrange 
-    const user = await new UserRepository().getUserByID(userId)
     const confirmCode = await new ConfirmUserRepository().getConfirmationByUserId(userId)
+    const { confirmed } = await new UserRepository().getUserByID(userId) as User
+    const decodedResult = decodedToken(result.data?.confirmEmail?.token) as ClientUser
 
     // Assert
     expect(result).toBeTruthy()
-    expect(user?.confirmed).toBeTruthy()
+    expect(confirmed).toBeTruthy()
     expect(confirmCode).toBeFalsy()
+    expect(decodedResult.email).toEqual(email)
+    
   })
 
   test('It should return "invalid code"', async () => {
     // Arrange
     const { userId } = await new ConfirmCodeBuilder().insert()
-
+    const { email } = await new UserRepository().getUserByID(userId) as User
     const query = `
     query confirmEmail {
-      confirmEmail(code: ${123456}, userId: "${userId}")
+      confirmEmail(code: ${123456}, email: "${email}"){
+        token
+      }
     }
     `
 
@@ -67,9 +81,13 @@ describe(('ConfirmEmailResolver'), () => {
     .withExpiresIn(expiredTime)
     .insert()
 
+    const { email } = await new UserRepository().getUserByID(userId) as User
+
     const query = `
     query confirmEmail {
-      confirmEmail(code: ${code}, userId: "${userId}")
+      confirmEmail(code: ${code}, email: "${email}"){
+        token
+      }
     }
     `
 
@@ -96,7 +114,9 @@ describe(('ConfirmEmailResolver'), () => {
 
     const query = `
     query confirmEmail {
-      confirmEmail(code: ${code}, userId: "${user.id}")
+      confirmEmail(code: ${code}, email: "${user.email}"){
+        token
+      }
     }
     `
 

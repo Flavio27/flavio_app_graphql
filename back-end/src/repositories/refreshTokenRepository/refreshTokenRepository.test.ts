@@ -10,7 +10,7 @@ describe('refreshTokenRepository', () => {
 
     // Act
     const user = await new UserBuilder().insert()
-    const newRefreshToken = await refreshTokenRepository.createRefreshToken(user.id, refreshTokenExpirationTime)
+    const newRefreshToken = await refreshTokenRepository.createRefreshToken(user.id, refreshTokenExpirationTime())
     const refreshToken = await prisma.refreshToken.findUnique({
       where: {
         id: newRefreshToken.id
@@ -28,7 +28,7 @@ describe('refreshTokenRepository', () => {
 
     // Act
     const user = await new UserBuilder().insert()
-    const newRefreshToken = await refreshTokenRepository.createRefreshToken(user.id, refreshTokenExpirationTime)
+    const newRefreshToken = await refreshTokenRepository.createRefreshToken(user.id, refreshTokenExpirationTime())
     const refreshToken = await refreshTokenRepository.getRefreshTokenById(newRefreshToken.id)
 
     // Assert
@@ -42,7 +42,7 @@ describe('refreshTokenRepository', () => {
 
     // Act
     const user = await new UserBuilder().insert()
-    const newRefreshToken = await refreshTokenRepository.createRefreshToken(user.id, refreshTokenExpirationTime)
+    const newRefreshToken = await refreshTokenRepository.createRefreshToken(user.id, refreshTokenExpirationTime())
     const refreshToken = await refreshTokenRepository.getRefreshTokenByUserId(user.id)
 
     // Assert
@@ -56,7 +56,7 @@ describe('refreshTokenRepository', () => {
 
     // Act
     const user = await new UserBuilder().insert()
-    const newRefreshToken = await refreshTokenRepository.createRefreshToken(user.id, refreshTokenExpirationTime)
+    const newRefreshToken = await refreshTokenRepository.createRefreshToken(user.id, refreshTokenExpirationTime())
     await refreshTokenRepository.deleteRefreshToken(user.id)
 
     const refreshToken = await refreshTokenRepository.getRefreshTokenById(newRefreshToken.id)
@@ -71,8 +71,8 @@ describe('refreshTokenRepository', () => {
 
     // Act
     const user = await new UserBuilder().insert()
-    const firstRefreshToken = await refreshTokenRepository.createRefreshToken(user.id, refreshTokenExpirationTime)
-    const renewRefreshToken = await refreshTokenRepository.renewRefreshToken(firstRefreshToken.userId, refreshTokenExpirationTime)
+    const firstRefreshToken = await refreshTokenRepository.createRefreshToken(user.id, refreshTokenExpirationTime())
+    const renewRefreshToken = await refreshTokenRepository.renewRefreshToken(firstRefreshToken.userId, refreshTokenExpirationTime())
     const secondRefreshToken = await refreshTokenRepository.getRefreshTokenByUserId(user.id)
     const firstRefreshTokenExists = await refreshTokenRepository.getRefreshTokenById(firstRefreshToken.id)
 

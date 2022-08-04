@@ -20,7 +20,7 @@ export class RefreshTokenResolver {
     
     if (refreshTokenExpired){
       const expiresIn = refreshTokenExpirationTime
-      await this.repository.renewRefreshToken(userId, expiresIn)
+      await this.repository.renewRefreshToken(userId, expiresIn())
     }
 
     const user = await new UserRepository().getUserByID(userId)

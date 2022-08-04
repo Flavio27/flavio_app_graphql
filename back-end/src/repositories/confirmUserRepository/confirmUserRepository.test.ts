@@ -22,7 +22,7 @@ describe('confirmUserRepository.test', () => {
   test('It should create a confirm code', async() => {
     const user = await new UserBuilder().insert()
     const newConfirmCode = await new ConfirmUserRepository()
-    .createConfirmCode(user.id, randomCode(), confirmEmailCodeExpirationTime)
+    .createConfirmCode(user.id, randomCode(), confirmEmailCodeExpirationTime())
 
     const confirmCode = await new ConfirmUserRepository()
     .getConfirmationByUserId(newConfirmCode.userId)
